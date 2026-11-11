@@ -33,7 +33,7 @@ export const App: React.FC = () => {
 
   // Configuration State
   const [backendUrl, setBackendUrl] = useState<string>(() => {
-    return localStorage.getItem('devpilot_backend_url') || '';
+    return localStorage.getItem('devpilot_backend_url') || (import.meta.env.VITE_API_BASE_URL as string) || '';
   });
   const [providerMode, setProviderMode] = useState<'live' | 'demo'>('demo');
   const [apiKey, setApiKey] = useState<string>('');
@@ -341,6 +341,18 @@ export const App: React.FC = () => {
     setIsRunning(false);
   };
 
+  const handleRunOfflineDemo = async (task: string) => {
+    setIsRunning(true);
+    setErrorMessage(null);
+    setToolCalls([]);
+    setCurrentPatch(null);
+    setTestRuns([]);
+    setReport(null);
+    setStages([]);
+    setEvents([]);
+    await runStandaloneSimulation(task);
+  };
+
   const startInvestigation = async (task: string) => {
     setIsRunning(true);
     setErrorMessage(null);
@@ -361,9 +373,14 @@ export const App: React.FC = () => {
       return;
     }
 
-    // If backend is offline, run the rich standalone client simulation
+    // If backend is offline, refuse silent fallback and require explicit user action
     if (!backendConnected) {
-      await runStandaloneSimulation(task);
+      setIsRunning(false);
+      setErrorMessage(
+        `Backend Connection Error: Unable to reach DevPilot API backend at ${backendUrl || window.location.origin}. ` +
+        `Live investigation requires an active backend server to launch MCP subprocesses. ` +
+        `Please check your backend status, open Settings to set the Backend URL, or click 'Run Offline Demo'.`
+      );
       return;
     }
 
@@ -779,21 +796,42 @@ Autonomous investigation of authentication service test failure. Root cause was 
 
       {/* Offline / Preview Mode Notice Banner */}
       {backendConnected === false && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-xs text-amber-900 flex items-center justify-between">
-          <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <span>⚠️</span>
-              <span>
-                <strong>Backend Server Offline</strong> — Operating in <strong>Standalone Demo Mode</strong>. To connect to a live Python MCP backend, start{' '}
-                <code className="bg-amber-100 px-1 py-0.5 rounded text-amber-950 font-mono">python -m devpilot.main</code> and enter your URL in Settings.
-              </span>
-            </span>
-            <button
-              onClick={() => setShowSettingsModal(true)}
-              className="text-orange-700 hover:text-orange-900 font-semibold underline text-xs ml-4 whitespace-nowrap"
-            >
-              Configure Endpoint
-            </button>
+        <div className="bg-rose-50 border-b border-rose-200 px-4 py-3 text-xs text-rose-950">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-2.5">
+              <span className="text-base leading-none">⚠️</span>
+              <div>
+                <strong className="font-semibold text-rose-900">Backend Server Offline</strong>
+                <span className="text-rose-800 ml-1.5">
+                  Cannot communicate with DevPilot API ({backendUrl || 'Local / Relative'}). Live MCP tool calls require a running backend server.
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => handleRunOfflineDemo(
+                  'Investigate why the authentication tests are failing, identify the root cause, propose a fix, and verify the solution. Do not modify anything without approval.'
+                )}
+                className="px-2.5 py-1 text-xs font-semibold rounded bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition-colors"
+              >
+                Run Offline Demo Simulation
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSettingsModal(true)}
+                className="px-2.5 py-1 text-xs font-semibold rounded bg-white hover:bg-stone-100 text-zinc-800 border border-stone-300 transition-colors"
+              >
+                Configure Endpoint
+              </button>
+              <button
+                type="button"
+                onClick={fetchHealth}
+                className="text-xs text-rose-700 hover:text-rose-900 underline font-medium ml-1"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -820,9 +858,11 @@ Autonomous investigation of authentication service test failure. Root cause was 
           <div className="lg:col-span-5 space-y-6">
             <RepoSelector
               onStartInvestigation={startInvestigation}
+              onRunOfflineDemo={handleRunOfflineDemo}
               isRunning={isRunning}
               activeSessionId={session?.id}
               providerMode={providerMode}
+              backendConnected={backendConnected}
               onOpenSettings={() => setShowSettingsModal(true)}
             />
 

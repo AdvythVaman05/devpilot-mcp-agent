@@ -49,6 +49,11 @@ class CreateSessionRequest(BaseModel):
     provider_mode: Optional[str] = Field(default=None, description="Optional provider mode: 'live' or 'demo'")
 
 
+class StartInvestigationRequest(BaseModel):
+    api_key: Optional[str] = Field(default=None, description="Optional Google Gemini API key")
+    provider_mode: Optional[str] = Field(default=None, description="Optional provider mode: 'live' or 'demo'")
+
+
 class ApprovePatchRequest(BaseModel):
     approval_token: str = Field(description="Cryptographic approval token matching proposed patch")
 
@@ -278,7 +283,7 @@ async def _run_agent_task(
 async def start_investigation(
     session_id: str,
     background_tasks: BackgroundTasks,
-    req: Optional[CreateSessionRequest] = None,
+    req: Optional[StartInvestigationRequest] = None,
 ) -> Dict[str, Any]:
     """Triggers autonomous investigation loop in the background."""
     db = get_db()

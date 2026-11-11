@@ -47,6 +47,11 @@ frontend/dist-ssr/
 *.db
 *.sqlite
 *.sqlite3
+*.sqlite3*
+
+# Local Tools
+.tools/
+
 
 # IDE & OS
 .vscode/

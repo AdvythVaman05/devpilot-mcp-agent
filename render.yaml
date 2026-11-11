@@ -1,8 +1,8 @@
 services:
   - type: web
     name: devpilot-backend
-    env: python
-    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build && cd ..
+    runtime: python
+    buildCommand: pip install -r requirements.txt
     startCommand: python -m devpilot.main --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
@@ -11,5 +11,7 @@ services:
         sync: false
       - key: GEMINI_MODEL
         value: gemini-2.5-flash
+      - key: PROVIDER_MODE
+        value: demo
     healthCheckPath: /api/health
     plan: free

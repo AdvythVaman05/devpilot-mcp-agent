@@ -3,17 +3,21 @@ import { GitBranch, Play, FolderGit2, Info } from 'lucide-react';
 
 interface RepoSelectorProps {
   onStartInvestigation: (task: string) => void;
+  onRunOfflineDemo: (task: string) => void;
   isRunning: boolean;
   activeSessionId?: string;
   providerMode: 'live' | 'demo';
+  backendConnected: boolean | null;
   onOpenSettings: () => void;
 }
 
 export const RepoSelector: React.FC<RepoSelectorProps> = ({
   onStartInvestigation,
+  onRunOfflineDemo,
   isRunning,
   activeSessionId,
   providerMode,
+  backendConnected,
   onOpenSettings,
 }) => {
   const [taskInput, setTaskInput] = useState(
@@ -124,27 +128,40 @@ export const RepoSelector: React.FC<RepoSelectorProps> = ({
             placeholder="Describe the software engineering task for DevPilot..."
             className="flex-1 text-sm bg-stone-50/60 text-zinc-900 border border-stone-300 rounded-lg px-3.5 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-sans"
           />
-          <button
-            type="submit"
-            disabled={isRunning || !taskInput.trim()}
-            className={`sm:w-44 px-4 py-2.5 rounded-lg text-sm font-semibold text-white flex items-center justify-center space-x-2 transition-all shadow-xs ${
-              isRunning
-                ? 'bg-orange-500/70 cursor-not-allowed'
-                : 'bg-orange-600 hover:bg-orange-700 active:scale-[0.98]'
-            }`}
-          >
-            {isRunning ? (
-              <>
-                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>Investigating...</span>
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4 fill-white" />
-                <span>Launch Agent</span>
-              </>
+          <div className="flex flex-col sm:w-48 gap-1.5 justify-center">
+            <button
+              type="submit"
+              disabled={isRunning || !taskInput.trim()}
+              className={`w-full px-4 py-2.5 rounded-lg text-xs font-semibold text-white flex items-center justify-center space-x-2 transition-all shadow-xs ${
+                isRunning
+                  ? 'bg-orange-500/70 cursor-not-allowed'
+                  : 'bg-orange-600 hover:bg-orange-700 active:scale-[0.98]'
+              }`}
+            >
+              {isRunning ? (
+                <>
+                  <span className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span>Investigating...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="h-3.5 w-3.5 fill-white" />
+                  <span>Launch Agent</span>
+                </>
+              )}
+            </button>
+            {backendConnected === false && (
+              <button
+                type="button"
+                onClick={() => onRunOfflineDemo(taskInput)}
+                disabled={isRunning || !taskInput.trim()}
+                className="w-full px-3 py-1.5 rounded-lg text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 flex items-center justify-center space-x-1.5 transition-all"
+                title="Runs client-side simulation when backend is unavailable"
+              >
+                <span>⚡ Run Offline Demo</span>
+              </button>
             )}
-          </button>
+          </div>
         </div>
       </form>
     </div>

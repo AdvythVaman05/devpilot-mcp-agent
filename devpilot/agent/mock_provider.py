@@ -50,13 +50,25 @@ class MockGeminiProvider:
         """
         self.turn += 1
 
-        # Check if run_tests has been executed
+        # Check if tools have been executed
+        inspect_calls = [c for c in tool_history if c["tool_name"] == "inspect_repository"]
         test_calls = [c for c in tool_history if c["tool_name"] == "run_tests"]
         search_calls = [c for c in tool_history if c["tool_name"] == "search_code"]
         read_calls = [c for c in tool_history if c["tool_name"] == "read_file"]
         patch_calls = [c for c in tool_history if c["tool_name"] == "propose_patch"]
 
-        # Step 1: No tests run yet -> Call run_tests to establish baseline
+        # Step 1: Inspect repository architecture
+        if not inspect_calls:
+            return MockGeminiResponse([
+                MockCandidate(
+                    text="[SIMULATED REASONING - DEMO MODE] Inspecting repository topology, directory tree, and git status.",
+                    function_calls=[
+                        MockToolCall("inspect_repository", {})
+                    ]
+                )
+            ])
+
+        # Step 2: No tests run yet -> Call run_tests to establish baseline
         if not test_calls:
             return MockGeminiResponse([
                 MockCandidate(

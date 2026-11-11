@@ -61,12 +61,18 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Backend Status Pill */}
-          {health && (
-            <div className="hidden lg:flex items-center space-x-1.5 text-xs bg-[#f4f2ee] px-2.5 py-1.5 rounded-md border border-[#e4e2dd]">
-              <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-              <span className="text-[#52525b]">MCP 2.x</span>
-            </div>
-          )}
+          <div
+            onClick={onOpenSettings}
+            className={`hidden sm:flex items-center space-x-1.5 text-xs px-2.5 py-1.5 rounded-md border cursor-pointer transition-colors ${
+              health
+                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
+            }`}
+            title={health ? 'Backend Connected: MCP 2.x Server Active' : 'Backend Unreachable: Click to configure URL in Settings'}
+          >
+            <span className={`h-2 w-2 rounded-full ${health ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`}></span>
+            <span>{health ? 'Backend: Online' : 'Backend: Offline'}</span>
+          </div>
 
           {/* Settings Button */}
           <button

@@ -342,8 +342,8 @@ class AgentOrchestrator:
                         if not baseline_runs:
                             self._set_stage(4, "running", explanation=f"Executing baseline tests via command '{call_args.get('command', 'pytest -v')}'...")
 
-                    elif call_name in ("search_code", "read_file"):
-                        self._set_stage(5, "running", explanation=f"Inspecting code via {call_name} ({call_args.get('query') or call_args.get('file_path')})...")
+                    elif call_name in ("search_code", "read_file", "inspect_repository"):
+                        self._set_stage(5, "running", explanation=f"Inspecting repository structure and code via {call_name}...")
 
                     elif call_name == "propose_patch":
                         self._set_stage(7, "running", explanation="Synthesizing minimal diff patch and cryptographic token...")
@@ -396,8 +396,8 @@ class AgentOrchestrator:
                             self._emit("plan_updated", {"steps": plan_steps})
 
                     # Handle code inspection
-                    if call_name in ("search_code", "read_file"):
-                        detail_msg = f"{call_name}: {call_args.get('query') or call_args.get('file_path')}"
+                    if call_name in ("search_code", "read_file", "inspect_repository"):
+                        detail_msg = f"{call_name}: {call_args.get('query') or call_args.get('file_path') or 'repository overview'}"
                         self._record_event("TOOL", f"Code Inspection: {call_name}", detail_msg, status="info")
                         if call_name == "read_file":
                             self._set_stage(5, "completed", evidence=f"Read {call_args.get('file_path')} (lines {call_args.get('start_line')}-{call_args.get('end_line')})")
