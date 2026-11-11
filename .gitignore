@@ -42,6 +42,8 @@ frontend/dist-ssr/
 .env
 .env.*
 !.env.example
+!frontend/.env.production
+
 
 # Databases
 *.db

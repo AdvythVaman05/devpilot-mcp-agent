@@ -33,7 +33,9 @@ export const App: React.FC = () => {
 
   // Configuration State
   const [backendUrl, setBackendUrl] = useState<string>(() => {
-    return localStorage.getItem('devpilot_backend_url') || (import.meta.env.VITE_API_BASE_URL as string) || '';
+    const saved = localStorage.getItem('devpilot_backend_url');
+    if (saved && saved.trim()) return saved.trim();
+    return (import.meta.env.VITE_API_BASE_URL as string) || 'https://devpilot-backend-production-69a81a4f.up.railway.app';
   });
   const [providerMode, setProviderMode] = useState<'live' | 'demo'>('demo');
   const [apiKey, setApiKey] = useState<string>('');

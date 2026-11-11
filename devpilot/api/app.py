@@ -35,7 +35,22 @@ app.add_middleware(
 # Register API routes
 app.include_router(router)
 
+
+@app.get("/")
+def get_root():
+    """Root endpoint providing service metadata."""
+    return {
+        "service": "DevPilot Backend API",
+        "status": "online",
+        "protocol": "Model Context Protocol (MCP) 2.x",
+        "health": "/api/health",
+        "docs": "/docs",
+        "frontend": "https://devpilot-mcp-agent.vercel.app",
+    }
+
+
 # Serve built frontend static files if present
 frontend_dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 if frontend_dist.exists() and frontend_dist.is_dir():
-    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
+    app.mount("/app", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
+

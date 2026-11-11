@@ -44,8 +44,9 @@ class ApprovalEngine:
 
         # Status check
         if patch["status"] != "PENDING_APPROVAL":
+            current_status = patch["status"]
             raise UnauthorizedWriteError(
-                f"Patch '{patch_id}' is in status '{patch["status"]}'. "
+                f"Patch '{patch_id}' is in status '{current_status}'. "
                 "Only patches in 'PENDING_APPROVAL' state may be approved and applied."
             )
 

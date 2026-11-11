@@ -1,8 +1,11 @@
 import json
+import os
+import sys
 import time
 import requests
 
-BASE = "http://127.0.0.1:8000/api"
+BASE = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("DEVPILOT_API_URL", "http://127.0.0.1:8000/api")
+
 
 print("--- 1. Health Check ---")
 res = requests.get(f"{BASE}/health")
