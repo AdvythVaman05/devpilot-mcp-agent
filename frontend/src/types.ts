@@ -2,7 +2,7 @@ export interface Session {
   id: string;
   repository_path: string;
   task_description: string;
-  status: 'INITIALIZING' | 'INVESTIGATING' | 'AWAITING_APPROVAL' | 'PATCH_APPROVED' | 'PATCH_REJECTED' | 'VERIFYING' | 'COMPLETED' | 'FAILED';
+  status: 'INITIALIZING' | 'INVESTIGATING' | 'AWAITING_APPROVAL' | 'PATCH_APPROVED' | 'PATCH_REJECTED' | 'VERIFYING' | 'COMPLETED' | 'FAILED' | 'REJECTED';
   created_at: string;
   updated_at: string;
 }
@@ -18,6 +18,30 @@ export interface Plan {
   session_id: string;
   steps: PlanStep[];
   current_step_index: number;
+}
+
+export interface Stage {
+  id: string;
+  session_id: string;
+  stage_id: number;
+  name: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  started_at?: number | null;
+  completed_at?: number | null;
+  duration_seconds?: number | null;
+  explanation: string;
+  evidence: string;
+}
+
+export interface ExecutionEvent {
+  id: string;
+  session_id: string;
+  category: 'AGENT' | 'MCP' | 'TOOL' | 'TEST' | 'APPROVAL' | 'VERIFICATION' | 'ERROR';
+  title: string;
+  detail: string;
+  data?: any;
+  status: 'info' | 'success' | 'warning' | 'error';
+  timestamp: string;
 }
 
 export interface ToolCall {
@@ -82,7 +106,18 @@ export interface SystemHealth {
   app_name: string;
   version: string;
   sample_repo_available: boolean;
+  provider_mode?: 'live' | 'demo' | string;
   gemini_api_key_configured: boolean;
   active_provider: string;
+  mcp_server_status?: string;
+  protocol: string;
+}
+
+export interface ApiConfig {
+  provider_mode: 'live' | 'demo';
+  gemini_model: string;
+  gemini_api_key_configured: boolean;
+  command_timeout_seconds: number;
+  sample_repo_available: boolean;
   protocol: string;
 }

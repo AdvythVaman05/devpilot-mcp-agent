@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     # Gemini AI configuration
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
+    PROVIDER_MODE: str = "demo"  # "demo" or "live"
     
     # Security & Guardrails
     DEFAULT_REPO_ROOT: Path = Path(__file__).resolve().parent.parent / "sample_repo"

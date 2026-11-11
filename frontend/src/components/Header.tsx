@@ -1,18 +1,22 @@
 import React from 'react';
-import { Terminal, RefreshCw, BookOpen, ExternalLink } from 'lucide-react';
+import { Terminal, RefreshCw, BookOpen, ExternalLink, Settings as SettingsIcon } from 'lucide-react';
 import type { SystemHealth } from '../types';
 
 interface HeaderProps {
   health: SystemHealth | null;
+  providerMode: 'live' | 'demo';
   onResetRepo: () => void;
   onOpenArchitecture: () => void;
+  onOpenSettings: () => void;
   isResetting: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   health,
+  providerMode,
   onResetRepo,
   onOpenArchitecture,
+  onOpenSettings,
   isResetting,
 }) => {
   return (
@@ -26,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-semibold text-lg tracking-tight text-[#18181b]">DevPilot</span>
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#ffedd5] text-[#ea580c] border border-[#fed7aa]">
+              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-orange-100 text-orange-700 border border-orange-200">
                 MCP Agent
               </span>
             </div>
@@ -37,24 +41,52 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Status Pills and Actions */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
+          {/* Provider Mode Pill */}
+          <div
+            onClick={onOpenSettings}
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border cursor-pointer transition-colors ${
+              providerMode === 'live'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+            }`}
+            title="Click to configure provider mode and credentials"
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                providerMode === 'live' ? 'bg-emerald-500' : 'bg-amber-500'
+              }`}
+            ></span>
+            <span>{providerMode === 'live' ? 'Live Gemini' : 'Demo Mode'}</span>
+          </div>
+
+          {/* Backend Status Pill */}
           {health && (
-            <div className="hidden md:flex items-center space-x-2 text-xs bg-[#f4f2ee] px-2.5 py-1.5 rounded-md border border-[#e4e2dd]">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[#52525b]">{health.protocol}</span>
-              <span className="text-[#a1a1aa]">•</span>
-              <span className="font-medium text-[#18181b]">{health.active_provider}</span>
+            <div className="hidden lg:flex items-center space-x-1.5 text-xs bg-[#f4f2ee] px-2.5 py-1.5 rounded-md border border-[#e4e2dd]">
+              <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span className="text-[#52525b]">MCP 2.x</span>
             </div>
           )}
 
+          {/* Settings Button */}
           <button
-            onClick={onOpenArchitecture}
+            onClick={onOpenSettings}
             className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-[#18181b] bg-[#f4f2ee] hover:bg-[#e9e6df] rounded-md border border-[#e4e2dd] transition-colors"
           >
-            <BookOpen className="h-3.5 w-3.5 text-[#52525b]" />
-            <span>Architecture & Specs</span>
+            <SettingsIcon className="h-3.5 w-3.5 text-[#52525b]" />
+            <span>Settings</span>
           </button>
 
+          {/* Architecture Modal */}
+          <button
+            onClick={onOpenArchitecture}
+            className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-[#18181b] bg-[#f4f2ee] hover:bg-[#e9e6df] rounded-md border border-[#e4e2dd] transition-colors"
+          >
+            <BookOpen className="h-3.5 w-3.5 text-[#52525b]" />
+            <span>Specs</span>
+          </button>
+
+          {/* Reset Sandbox */}
           <button
             onClick={onResetRepo}
             disabled={isResetting}
@@ -62,9 +94,10 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-[#52525b] hover:text-[#18181b] bg-[#ffffff] hover:bg-[#f4f2ee] rounded-md border border-[#e4e2dd] transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isResetting ? 'animate-spin text-[#ea580c]' : ''}`} />
-            <span className="hidden sm:inline">Reset Sandbox</span>
+            <span className="hidden sm:inline">Reset</span>
           </button>
 
+          {/* GitHub Repo Link */}
           <a
             href="https://github.com/AdvythVaman05/devpilot-mcp-agent"
             target="_blank"

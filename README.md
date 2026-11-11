@@ -1,13 +1,14 @@
 # DevPilot 🚀
 
 > **Production-Style MCP Software Engineering Agent with Verifiable Human-in-the-Loop Governance**  
-> *Developed for the AI-Native Software Engineering Internship Application at EPAM Systems.*
+> *Autonomous code investigation, test failure diagnosis, human-approved patching, and regression verification.*
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![MCP 2.x Compliant](https://img.shields.io/badge/MCP-2.x%20Official%20SDK-orange.svg)](https://modelcontextprotocol.io/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![React 19](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev)
-[![Tests Passing](https://img.shields.io/badge/tests-33%20passed-success.svg)](TESTING.md)
+[![Tests Passing](https://img.shields.io/badge/tests-39%20passed-success.svg)](TESTING.md)
+[![Live Demo](https://img.shields.io/badge/Vercel-devpilot--mcp--agent.vercel.app-blueviolet.svg)](https://devpilot-mcp-agent.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -252,9 +253,10 @@ Access the dashboard at `http://localhost:8000`.
 
 ---
 
-## 11. EPAM Internship Application Highlights
+## 11. Core Engineering Competencies & Architecture Highlights
 
-- **Agentic Development:** Multi-turn autonomous planning, baseline observation, and hypothesis testing.
-- **Protocol Engineering:** Genuine implementation of official Model Context Protocol (MCP v2.x) client and server.
-- **Production Governance:** Backend authorization gate with cryptographic tokens.
-- **Quality Assurance:** Verification engine and 33 automated tests.
+- **Agentic Development:** Multi-turn autonomous planning, baseline observation, 10-stage event-driven execution, and hypothesis testing.
+- **Protocol Engineering:** Genuine implementation of official Model Context Protocol (MCP v2.x) client and server over stdio transport.
+- **Production Governance:** Backend authorization gate with cryptographic tokens and human-in-the-loop review.
+- **Quality Assurance:** Verification engine and 39 automated tests with 100% pass rate.
+- **Live Deployment:** Production frontend available at [https://devpilot-mcp-agent.vercel.app](https://devpilot-mcp-agent.vercel.app).

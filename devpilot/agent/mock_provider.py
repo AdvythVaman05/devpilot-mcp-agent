@@ -60,7 +60,7 @@ class MockGeminiProvider:
         if not test_calls:
             return MockGeminiResponse([
                 MockCandidate(
-                    text="Establishing baseline by executing test suite...",
+                    text="[SIMULATED REASONING - DEMO MODE] Establishing baseline test execution to identify failing tests in the test suite.",
                     function_calls=[
                         MockToolCall("run_tests", {"command": "pytest -v --tb=short"})
                     ]
@@ -72,7 +72,7 @@ class MockGeminiProvider:
         if last_test.get("failed", 0) > 0 and not search_calls:
             return MockGeminiResponse([
                 MockCandidate(
-                    text="Baseline test failure observed in `test_valid_token_verification`. Searching codebase for TokenExpiredError...",
+                    text="[SIMULATED REASONING - DEMO MODE] Baseline test failure observed in `test_valid_token_verification`. Searching codebase for TokenExpiredError...",
                     function_calls=[
                         MockToolCall("search_code", {"query": "TokenExpiredError", "file_pattern": "*.py"})
                     ]
@@ -83,7 +83,7 @@ class MockGeminiProvider:
         if search_calls and not read_calls:
             return MockGeminiResponse([
                 MockCandidate(
-                    text="TokenExpiredError located in auth_service/auth.py. Inspecting implementation...",
+                    text="[SIMULATED REASONING - DEMO MODE] TokenExpiredError located in auth_service/auth.py. Inspecting implementation around expiration verification...",
                     function_calls=[
                         MockToolCall("read_file", {"file_path": "auth_service/auth.py", "start_line": 70, "end_line": 105})
                     ]
@@ -107,7 +107,7 @@ class MockGeminiProvider:
             )
             return MockGeminiResponse([
                 MockCandidate(
-                    text="Root cause identified: Inverted comparison operator in token expiration check. Proposing patch for human approval.",
+                    text="[SIMULATED REASONING - DEMO MODE] Root cause diagnosed: Inverted comparison operator in token expiration check. Proposing minimal diff patch for human authorization.",
                     function_calls=[
                         MockToolCall("propose_patch", {
                             "target_file": "auth_service/auth.py",
@@ -122,7 +122,7 @@ class MockGeminiProvider:
         return MockGeminiResponse([
             MockCandidate(
                 text=(
-                    "Investigation and patch proposal completed. "
+                    "[SIMULATED REASONING - DEMO MODE] Investigation and patch proposal completed. "
                     "The agent identified the inverted comparison operator `>` on line 88 of `auth_service/auth.py`. "
                     "The patch has been proposed and stored with status PENDING_APPROVAL. "
                     "Awaiting explicit user authorization before applying changes to the filesystem."

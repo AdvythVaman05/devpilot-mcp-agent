@@ -114,9 +114,39 @@ class Database:
                 FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS session_stages (
+                id TEXT PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                stage_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                status TEXT NOT NULL,
+                started_at REAL,
+                completed_at REAL,
+                duration_seconds REAL,
+                explanation TEXT,
+                evidence TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS execution_events (
+                id TEXT PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                category TEXT NOT NULL,
+                title TEXT NOT NULL,
+                detail TEXT,
+                data TEXT,
+                status TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            );
+
             CREATE INDEX IF NOT EXISTS idx_tool_calls_session ON tool_calls(session_id);
             CREATE INDEX IF NOT EXISTS idx_patches_session ON patches(session_id);
             CREATE INDEX IF NOT EXISTS idx_test_runs_session ON test_runs(session_id);
+            CREATE INDEX IF NOT EXISTS idx_stages_session ON session_stages(session_id);
+            CREATE INDEX IF NOT EXISTS idx_events_session ON execution_events(session_id);
             """)
 
     # --- Sessions ---
@@ -368,6 +398,120 @@ class Database:
         cur = conn.execute("SELECT * FROM reports WHERE session_id = ?", (session_id,))
         row = cur.fetchone()
         return dict(row) if row else None
+
+    # --- Stages ---
+    def record_stage(
+        self,
+        session_id: str,
+        stage_id: int,
+        name: str,
+        status: str,
+        explanation: str,
+        evidence: str = "",
+        started_at: Optional[float] = None,
+        completed_at: Optional[float] = None,
+        duration_seconds: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        conn = self.get_connection()
+        stage_record_id = f"{session_id}_stage_{stage_id}"
+        with conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO session_stages (
+                    id, session_id, stage_id, name, status, started_at,
+                    completed_at, duration_seconds, explanation, evidence, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    stage_record_id,
+                    session_id,
+                    stage_id,
+                    name,
+                    status,
+                    started_at,
+                    completed_at,
+                    duration_seconds,
+                    explanation,
+                    evidence,
+                    now_iso(),
+                )
+            )
+        return {
+            "id": stage_record_id,
+            "session_id": session_id,
+            "stage_id": stage_id,
+            "name": name,
+            "status": status,
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "duration_seconds": duration_seconds,
+            "explanation": explanation,
+            "evidence": evidence,
+        }
+
+    def get_stages(self, session_id: str) -> List[Dict[str, Any]]:
+        conn = self.get_connection()
+        cur = conn.execute("SELECT * FROM session_stages WHERE session_id = ? ORDER BY stage_id ASC", (session_id,))
+        return [dict(row) for row in cur.fetchall()]
+
+    # --- Execution Events ---
+    def record_event(
+        self,
+        session_id: str,
+        category: str,
+        title: str,
+        detail: str = "",
+        data: Any = None,
+        status: str = "info",
+        timestamp: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        import uuid
+        event_id = f"evt_{uuid.uuid4().hex[:8]}"
+        clean_data = redact_sensitive_data(data) if data is not None else None
+        ts = timestamp or datetime.now(timezone.utc).strftime("%H:%M:%S")
+        conn = self.get_connection()
+        with conn:
+            conn.execute(
+                """
+                INSERT INTO execution_events (id, session_id, category, title, detail, data, status, timestamp, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    event_id,
+                    session_id,
+                    category,
+                    title,
+                    detail,
+                    json.dumps(clean_data) if clean_data is not None else None,
+                    status,
+                    ts,
+                    now_iso(),
+                )
+            )
+        return {
+            "id": event_id,
+            "session_id": session_id,
+            "category": category,
+            "title": title,
+            "detail": detail,
+            "data": clean_data,
+            "status": status,
+            "timestamp": ts,
+        }
+
+    def get_events(self, session_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+        conn = self.get_connection()
+        cur = conn.execute("SELECT * FROM execution_events WHERE session_id = ? ORDER BY created_at ASC LIMIT ?", (session_id, limit))
+        results = []
+        for row in cur.fetchall():
+            item = dict(row)
+            if item.get("data"):
+                try:
+                    item["data"] = json.loads(item["data"])
+                except Exception:
+                    pass
+            results.append(item)
+        return results
 
 
 _db_instance: Optional[Database] = None

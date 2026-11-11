@@ -20,7 +20,7 @@ export const ArchitectureModal: React.FC<ArchitectureModalProps> = ({ isOpen, on
             <div>
               <h2 className="text-base font-bold text-[#18181b]">DevPilot System Architecture & Protocol Specs</h2>
               <p className="text-xs text-[#52525b]">
-                EPAM Systems AI-Native Software Engineering Internship Portfolio
+                Production-Style Autonomous Model Context Protocol (MCP) Agent Platform
               </p>
             </div>
           </div>
@@ -86,7 +86,7 @@ export const ArchitectureModal: React.FC<ArchitectureModalProps> = ({ isOpen, on
           {/* Section 5 */}
           <div className="p-4 bg-[#ffedd5]/50 rounded-xl border border-[#fed7aa]">
             <h4 className="font-semibold text-xs text-[#ea580c] uppercase tracking-wider mb-2">
-              Competency Alignment for EPAM AI-Native Engineering
+              Core Engineering Competencies & Architecture
             </h4>
             <ul className="list-disc pl-5 space-y-1 text-xs text-[#431407]">
               <li><strong>Agentic Software Development:</strong> Autonomous tool orchestration, planning, and multi-turn diagnostics.</li>
